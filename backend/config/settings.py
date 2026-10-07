@@ -12,12 +12,12 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 import environ
-env=envrion.Env()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+env=environ.Env()
 environ.Env.read_env(BASE_DIR / ".env")
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -144,7 +144,7 @@ AUTH_USER_MODEL = 'users.User'
 DATABASES = {"default": env.db("DATABASE_URL")}
 
 REST_FRAMEWORK = {
-    'default_schema_class': 'drf_spectacular.openapi.AutoSchema',
+    'default_schema_class': 'drf-spectacular.openapi.AutoSchema',
     'default_aunthentication_classes':[
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
