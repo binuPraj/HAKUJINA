@@ -1,4 +1,12 @@
-venv/
-.env
+# Local Python environment
+/venv/
+
+# Environment files
+/.env
+
+# Python caches and generated test/type-checker data
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
