@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import environ
 
@@ -23,8 +24,9 @@ environ.Env.read_env(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#9qcf(v5!e@milk_xls6rkm3s7)tyvuv=w96!oo7chr1lblma*'
+SECRET_KEY = env("SECRET_KEY")
+DEBUG = env.bool("DEBUG", default=False)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -132,23 +134,44 @@ STATIC_URL = 'static/'
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+if env.bool("USE_SMTP", default=False):
+       MAILERS = {
+           "default": {
+               "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+               "OPTIONS": {
+                   "host": env("EMAIL_HOST"),
+                   "port": env.int("EMAIL_PORT", default=587),
+                   "use_tls": True,
+                   "username": env("EMAIL_HOST_USER"),
+                   "password": env("EMAIL_HOST_PASSWORD"),
+               },
+           },
+       }
+else:
+       # Development: emails print in the runserver console
+       MAILERS = {
+           "default": {"BACKEND": "django.core.mail.backends.console.EmailBackend"},
+       }
 
 AUTH_USER_MODEL = 'users.User'
 
 DATABASES = {"default": env.db("DATABASE_URL")}
+FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:3000")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Pottery <noreply@example.com>")
 
 REST_FRAMEWORK = {
-    'default_schema_class': 'drf-spectacular.openapi.AutoSchema',
-    'default_aunthentication_classes':[
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework_simplejwt.authentication.JWTAuthentication"],
+    "DEFAULT_THROTTLE_RATES":{"resend_verification": "3/hour"},
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
+AUTH_USER_MODEL = "users.User" 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]        #next.js dev server
 
