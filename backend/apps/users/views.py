@@ -2,7 +2,7 @@ from django.db import transaction
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework.throttling import ScopeRateThrottle
+from rest_framework.throttling import ScopedRateThrottle 
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -59,7 +59,7 @@ class VerifyEmailView(APIView):
 
 class ResendVerificationView(APIView):
     permission_classes = [permissions.AllowAny]
-    throttle_classes = [ScopeRateThrottle]
+    throttle_classes = [ScopedRateThrottle]
     throttle_scope = "resend_verification"
 
     @extend_schema(request=ResendVerificationSerializer, responses={200: OpenApiResponse(description="Accepted")})
@@ -73,4 +73,4 @@ class ResendVerificationView(APIView):
         if user:
             send_verification_email(user)
 
-        return Response({"detail": "If that account exiss and is unverified, a new link has been sent."}, status=status.HTTP_200_OK_ACCEPTED)
+        return Response({"detail": "If that account exiss and is unverified, a new link has been sent."}, status=status.HTTP_202_ACCEPTED)
