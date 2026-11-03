@@ -4,7 +4,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle 
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import User
 from .serializers import (
@@ -13,6 +13,7 @@ from .serializers import (
     ResendVerificationSerializer,
     VerifyEmailSerializer,
     UserSerializer,
+    VerifiedTokenObtainPairSerializer,
 )
 from .services import send_verification_email
 
@@ -26,15 +27,16 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         transaction.on_commit(lambda: send_verification_email(user))
-        refresh = RefreshToken.for_user(user)
         return Response(
             {
                 "user": UserSerializer(user).data,
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
             },
             status= status.HTTP_201_CREATED,
         )
+
+
+class VerifiedTokenObtainPairView(TokenObtainPairView):
+    serializer_class = VerifiedTokenObtainPairSerializer
 
 class MeView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer

@@ -1,6 +1,10 @@
 from django.contrib.auth.password_validation import validate_password
 from django.core import signing
+from dns import exception as dns_exception
+from dns import resolver
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User
 from .tokens import read_verification_token
 
@@ -22,6 +26,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         value=value.lower()
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("An account with this email already exists")
+        try:
+            resolver.resolve(value.rsplit("@", 1)[1], "MX", lifetime=3)
+        except (dns_exception.DNSException, resolver.NoAnswer, resolver.NXDOMAIN):
+            raise serializers.ValidationError("This email domain cannot receive email.")
         return value
 
     def validate_password(self, value):
@@ -34,8 +42,21 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class RegisterResponseSerializer(serializers.Serializer):
     user= UserSerializer()
-    access= serializers.CharField()
-    refresh= serializers.CharField()
+
+
+class VerifiedTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        email = attrs.get("email", "").strip().lower()
+        user = User.objects.filter(email__iexact=email).first()
+        if user is None:
+            raise AuthenticationFailed("Please register/create an account first.")
+        if not user.check_password(attrs.get("password", "")):
+            raise AuthenticationFailed("Incorrect password.")
+        if not user.is_email_verified:
+            raise AuthenticationFailed("Please verify your email first.")
+
+        data = super().validate(attrs)
+        return data
 
 class VerifyEmailSerializer(serializers.Serializer):
     token= serializers.CharField()

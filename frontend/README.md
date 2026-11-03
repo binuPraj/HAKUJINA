@@ -16,8 +16,9 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). Set
-`NEXT_PUBLIC_API_URL` if the Django API is not at
-`http://localhost:8000/api/v1`.
+`NEXT_PUBLIC_API_URL` in `.env.local` if the Django API is not at
+`http://localhost:8000/api/v1`. You can copy `.env.example` to `.env.local`
+for the default local setup.
 
 In development, Django uses its console email backend unless SMTP is configured,
 so verification links are printed in the backend terminal.

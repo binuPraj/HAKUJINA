@@ -5,7 +5,11 @@ import { useState, type FormEvent } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { getRequestError, postAuth } from "@/lib/auth";
 
-type RegisterResponse = { detail: string; email: string };
+type RegisterResponse = {
+  user: { email: string };
+  access: string;
+  refresh: string;
+};
 
 export function RegisterForm() {
   const [busy, setBusy] = useState(false);
@@ -28,7 +32,7 @@ export function RegisterForm() {
 
     try {
       const result = await postAuth<RegisterResponse>("register", payload);
-      setPendingEmail(result.email);
+      setPendingEmail(result.user.email);
     } catch (requestError) {
       setError(getRequestError(requestError));
     } finally {

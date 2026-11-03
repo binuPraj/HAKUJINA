@@ -37,7 +37,6 @@ def test_register_success(client, django_capture_on_commit_callbacks):
     assert r.status_code == 201
     assert r.data["user"]["email"] == "binu@example.com"
     assert r.data["user"]["is_email_verified"] is False
-    assert "access" in r.data and "refresh" in r.data
     assert len(mail.outbox) == 1
 
 
@@ -66,14 +65,33 @@ def test_invalid_phone_rejected(client):
 
 
 def test_login_with_email(client, user):
+    user.is_email_verified = True
+    user.save(update_fields=["is_email_verified"])
     r = client.post(LOGIN, {"email": "a@b.com", "password": "StrongPass123!"}, format="json")
     assert r.status_code == 200
     assert "access" in r.data
 
 
+def test_unverified_user_cannot_login(client, user):
+    r = client.post(LOGIN, {"email": "a@b.com", "password": "StrongPass123!"}, format="json")
+    assert r.status_code == 401
+    assert r.data["detail"] == "Please verify your email first."
+
+
+def test_unregistered_user_cannot_login(client):
+    r = client.post(
+        LOGIN,
+        {"email": "nobody@example.com", "password": "StrongPass123!"},
+        format="json",
+    )
+    assert r.status_code == 401
+    assert r.data["detail"] == "Please register/create an account first."
+
+
 def test_login_wrong_password(client, user):
     r = client.post(LOGIN, {"email": "a@b.com", "password": "nope"}, format="json")
     assert r.status_code == 401
+    assert r.data["detail"] == "Incorrect password."
 
 
 def test_me_requires_auth(client):

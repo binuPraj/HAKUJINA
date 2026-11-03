@@ -30,7 +30,7 @@ export function LoginForm() {
       });
       window.localStorage.setItem("hakujina.access", result.access);
       window.localStorage.setItem("hakujina.refresh", result.refresh);
-      router.push("/");
+      router.push("/products");
     } catch (requestError) {
       setError(getRequestError(requestError));
     } finally {

@@ -32,10 +32,13 @@ class Category(SluggedModel):
         ordering=["sort_order", "name"]
 
     def clean(self):
-        if self.parent_id == self.pk:
+        if not self.parent_id:
+            return  # top-level category, nothing to validate
+
+        if self.pk and self.parent_id == self.pk:
             raise ValidationError("A category cannot be its own parent.")
         if self.parent.parent_id:
-            raise ValidationError("Only one level of subcategories is allowed.")
+            raise ValidationError("Only one level of subcategories is supported.")
         if self.pk and self.children.exists():
             raise ValidationError("A category that has subcategories cannot become a subcategory.")
 
