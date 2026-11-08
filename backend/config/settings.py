@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import environ
-
+from decimal import Decimal
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env=environ.Env()
@@ -176,5 +176,8 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = "users.User" 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DELIVERY_FEE = Decimal(env("DELIVERY_FEE", default="100"))
+OWNER_EMAIL = env("OWNER_EMAIL", default=""
+                  )
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]        #next.js dev server
 
