@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { getRequestError, postAuth } from "@/lib/auth";
+import { useStore } from "@/lib/store-context";
 
 type LoginResponse = { access: string; refresh: string };
 
 export function LoginForm() {
   const router = useRouter();
+  const { refreshUser, showToast } = useStore();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [showResend, setShowResend] = useState(false);
@@ -30,6 +32,8 @@ export function LoginForm() {
       });
       window.localStorage.setItem("hakujina.access", result.access);
       window.localStorage.setItem("hakujina.refresh", result.refresh);
+      await refreshUser();
+      showToast("Welcome back to Hakujina Studio.", "success");
       router.push("/products");
     } catch (requestError) {
       setError(getRequestError(requestError));
@@ -47,6 +51,7 @@ export function LoginForm() {
         email: resendEmail.trim(),
       });
       setResendMessage(result.detail);
+      showToast(result.detail, "info");
     } catch (requestError) {
       setResendMessage(getRequestError(requestError));
     } finally {
@@ -63,13 +68,29 @@ export function LoginForm() {
       <form className="auth-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Email address</span>
-          <input autoComplete="email" name="email" type="email" placeholder="you@example.com" required />
+          <input
+            autoComplete="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+          />
         </label>
         <label className="field">
           <span>Password</span>
-          <input autoComplete="current-password" name="password" type="password" placeholder="Your password" required />
+          <input
+            autoComplete="current-password"
+            name="password"
+            type="password"
+            placeholder="Your password"
+            required
+          />
         </label>
-        {error && <p className="form-error" role="alert">{error}</p>}
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
         <button className="button button-full" type="submit" disabled={busy}>
           {busy ? "Logging you in…" : "Log in"}
           {!busy && <span aria-hidden="true">↗</span>}
@@ -78,24 +99,46 @@ export function LoginForm() {
           New here? <Link href="/register">Create an account</Link>
         </p>
       </form>
+
       <div className="resend-block">
-        <button className="text-button" type="button" onClick={() => setShowResend(!showResend)}>
+        <button
+          className="text-button"
+          type="button"
+          onClick={() => setShowResend(!showResend)}
+        >
           Need a new verification email?
         </button>
         {showResend && (
           <form className="resend-form" onSubmit={handleResend}>
             <label className="field">
               <span>Email address</span>
-              <input autoComplete="email" type="email" value={resendEmail} onChange={(event) => setResendEmail(event.target.value)} placeholder="you@example.com" required />
+              <input
+                autoComplete="email"
+                type="email"
+                value={resendEmail}
+                onChange={(event) => setResendEmail(event.target.value)}
+                placeholder="you@example.com"
+                required
+              />
             </label>
-            <button className="button button-outline button-full" type="submit" disabled={resending}>
+            <button
+              className="button button-outline button-full"
+              type="submit"
+              disabled={resending}
+            >
               {resending ? "Sending…" : "Resend verification link"}
             </button>
-            {resendMessage && <p className="form-footnote" role="status">{resendMessage}</p>}
+            {resendMessage && (
+              <p className="form-footnote" role="status">
+                {resendMessage}
+              </p>
+            )}
           </form>
         )}
       </div>
-      <p className="switch-auth">New to Hakujina? <Link href="/register">Join us</Link></p>
+      <p className="switch-auth">
+        New to Hakujina? <Link href="/register">Join us</Link>
+      </p>
     </AuthShell>
   );
 }

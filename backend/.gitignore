@@ -4,6 +4,10 @@
 # Environment files
 /.env
 
+# Database
+*.sqlite3
+db.sqlite3
+
 # Python caches and generated test/type-checker data
 __pycache__/
 *.py[cod]

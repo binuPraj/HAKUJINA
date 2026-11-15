@@ -156,7 +156,43 @@ else:
 
 AUTH_USER_MODEL = 'users.User'
 
-DATABASES = {"default": env.db("DATABASE_URL")}
+import sys
+import socket
+
+def _is_pg_reachable(db_url_str: str) -> bool:
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(db_url_str)
+        if "postgres" not in (parsed.scheme or ""):
+            return True
+        host = parsed.hostname or "127.0.0.1"
+        port = parsed.port or 5432
+        with socket.create_connection((host, port), timeout=0.3):
+            return True
+    except Exception:
+        return False
+
+_is_testing = "pytest" in sys.modules or any("pytest" in a for a in sys.argv) or "test" in sys.argv
+_db_url = env("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")
+
+if env.bool("FORCE_POSTGRES", default=False):
+    # Explicit override: always use PostgreSQL regardless of reachability
+    DATABASES = {"default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")}
+elif _is_pg_reachable(_db_url):
+    # PostgreSQL is reachable — use it
+    DATABASES = {"default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")}
+else:
+    # PostgreSQL is NOT reachable → fall back to SQLite so dev server and tests work offline
+    _fallback_name = "test_db.sqlite3" if _is_testing else "dev_db.sqlite3"
+    _fallback_path = BASE_DIR / _fallback_name
+    print(f"\n[Notice] PostgreSQL is not reachable. Falling back to SQLite: {_fallback_path}\n")
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": _fallback_path,
+        }
+    }
+
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:3000")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Pottery <noreply@example.com>")
 
