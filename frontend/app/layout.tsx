@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store-context";
 import { SiteHeader } from "@/components/site-header";
@@ -30,7 +31,9 @@ export default function RootLayout({
       <body>
         <StoreProvider>
           <div className="studio-app-shell">
-            <SiteHeader />
+            <Suspense fallback={<header className="site-header-nav" />}>
+              <SiteHeader />
+            </Suspense>
             <main className="studio-main-content">{children}</main>
             <SiteFooter />
             <CartDrawer />

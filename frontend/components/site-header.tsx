@@ -1,12 +1,55 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useStore } from "@/lib/store-context";
 
-export function SiteHeader() {
+/** Inner component that uses usePathname — must be inside Suspense. */
+function NavLinks() {
   const pathname = usePathname();
+  const { isAuthenticated } = useStore();
+  return (
+    <>
+      <Link
+        href="/products"
+        className={`nav-link ${pathname === "/products" ? "active" : ""}`}
+      >
+        Collection
+      </Link>
+      <Link
+        href="/reservations"
+        className={`nav-link ${pathname.startsWith("/reservations") ? "active" : ""}`}
+      >
+        Reserve a Wheel
+      </Link>
+      <Link href="/#studio" className="nav-link">
+        The Studio
+      </Link>
+      <Link href="/#process" className="nav-link">
+        Our Process
+      </Link>
+      {isAuthenticated && (
+        <>
+          <Link
+            href="/orders"
+            className={`nav-link ${pathname.startsWith("/orders") ? "active" : ""}`}
+          >
+            Orders
+          </Link>
+          <Link
+            href="/bookings"
+            className={`nav-link ${pathname.startsWith("/bookings") ? "active" : ""}`}
+          >
+            Bookings
+          </Link>
+        </>
+      )}
+    </>
+  );
+}
+
+export function SiteHeader() {
   const { user, isAuthenticated, cartCount, openCart, logout } = useStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -25,32 +68,26 @@ export function SiteHeader() {
 
         {/* Desktop Primary Navigation */}
         <nav className="desktop-nav" aria-label="Main Navigation">
-          <Link
-            href="/products"
-            className={`nav-link ${pathname === "/products" ? "active" : ""}`}
+          <Suspense
+            fallback={
+              <>
+                <Link href="/products" className="nav-link">
+                  Collection
+                </Link>
+                <Link href="/reservations" className="nav-link">
+                  Reserve a Wheel
+                </Link>
+                <Link href="/#studio" className="nav-link">
+                  The Studio
+                </Link>
+                <Link href="/#process" className="nav-link">
+                  Our Process
+                </Link>
+              </>
+            }
           >
-            Collection
-          </Link>
-          <Link
-            href="/#studio"
-            className="nav-link"
-          >
-            The Studio
-          </Link>
-          <Link
-            href="/#process"
-            className="nav-link"
-          >
-            Our Process
-          </Link>
-          {isAuthenticated && (
-            <Link
-              href="/orders"
-              className={`nav-link ${pathname.startsWith("/orders") ? "active" : ""}`}
-            >
-              Orders
-            </Link>
-          )}
+            <NavLinks />
+          </Suspense>
         </nav>
 
         {/* Right Utility Navigation */}
@@ -83,6 +120,9 @@ export function SiteHeader() {
                   </div>
                   <Link href="/orders" className="account-menu-link">
                     My Orders
+                  </Link>
+                  <Link href="/bookings" className="account-menu-link">
+                    My Bookings
                   </Link>
                   <Link href="/cart" className="account-menu-link">
                     Shopping Bag
@@ -159,6 +199,13 @@ export function SiteHeader() {
             Collection
           </Link>
           <Link
+            href="/reservations"
+            className="mobile-nav-link"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Reserve a Pottery Wheel
+          </Link>
+          <Link
             href="/#studio"
             className="mobile-nav-link"
             onClick={() => setMobileMenuOpen(false)}
@@ -180,6 +227,13 @@ export function SiteHeader() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 My Orders
+              </Link>
+              <Link
+                href="/bookings"
+                className="mobile-nav-link"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                My Bookings
               </Link>
               <Link
                 href="/cart"

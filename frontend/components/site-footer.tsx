@@ -42,6 +42,9 @@ export function SiteFooter() {
               <Link href="/products">Shop All Pieces</Link>
             </li>
             <li>
+              <Link href="/reservations">Reserve a Pottery Wheel</Link>
+            </li>
+            <li>
               <Link href="/#studio">Our Studio Story</Link>
             </li>
             <li>
@@ -49,6 +52,9 @@ export function SiteFooter() {
             </li>
             <li>
               <Link href="/orders">Order Tracking</Link>
+            </li>
+            <li>
+              <Link href="/bookings">My Bookings</Link>
             </li>
             <li>
               <Link href="/cart">Shopping Bag</Link>

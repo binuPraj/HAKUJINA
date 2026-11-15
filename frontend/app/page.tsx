@@ -147,8 +147,8 @@ export default function HomePage() {
             <Link href="/products" className="button button-terracotta">
               Explore collection →
             </Link>
-            <Link href="#studio" className="hero-secondary-link">
-              Our studio story
+            <Link href="/reservations" className="hero-secondary-link">
+              Reserve a wheel →
             </Link>
           </div>
 
@@ -243,6 +243,79 @@ export default function HomePage() {
           <div className="story-actions">
             <Link href="/products" className="button button-terracotta">
               Shop Studio Pieces →
+            </Link>
+            <Link href="/reservations" className="button button-outline" style={{ marginLeft: "12px" }}>
+              Reserve a Wheel →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          STUDIO WHEEL RESERVATIONS SPOTLIGHT (Continuous Daily Operations)
+          ========================================================================= */}
+      <section className="workshops-spotlight-section">
+        <div className="section-head-row">
+          <div>
+            <p className="eyebrow-line">
+              <span className="eyebrow-dot" /> CONTINUOUS STUDIO RESERVATIONS
+            </p>
+            <h2 className="section-title-editorial">Throw on the wheel.</h2>
+          </div>
+          <Link href="/reservations" className="view-all-link">
+            Reserve a machine now →
+          </Link>
+        </div>
+
+        <div className="workshops-spotlight-grid">
+          <div className="workshop-spotlight-card">
+            <div className="spotlight-badge">SOLO SESSIONS</div>
+            <h3>Individual Pottery Wheel</h3>
+            <p>
+              Dedicated electric wheel station with foot pedal control, unlimited conditioned clay,
+              and trimming tools. Perfect for solo practice or creative meditation.
+            </p>
+            <div className="spotlight-meta">
+              <span>Flexible 30m–3h</span>
+              <span>·</span>
+              <span>From Rs. 200 / slot</span>
+            </div>
+            <Link href="/reservations" className="button button-terracotta button-small button-full">
+              Reserve Wheel Now →
+            </Link>
+          </div>
+
+          <div className="workshop-spotlight-card">
+            <div className="spotlight-badge">COUPLES & PAIRS</div>
+            <h3>Side-by-Side Wheels</h3>
+            <p>
+              Reserve 2 pottery machines simultaneously. Throw alongside your partner, friend,
+              or family member with full studio guidance and dual-kiln firing.
+            </p>
+            <div className="spotlight-meta">
+              <span>2 Machines</span>
+              <span>·</span>
+              <span>Side-by-Side</span>
+            </div>
+            <Link href="/reservations" className="button button-outline button-small button-full">
+              Book 2 Machines →
+            </Link>
+          </div>
+
+          <div className="workshop-spotlight-card">
+            <div className="spotlight-badge">SMALL GROUPS</div>
+            <h3>Studio Wheel Takeover</h3>
+            <p>
+              Reserve 3 or all 4 studio machines for birthdays, celebrations, or intimate creative
+              gatherings. Bisque firing and master studio dipping glazes included.
+            </p>
+            <div className="spotlight-meta">
+              <span>Up to 4 Wheels</span>
+              <span>·</span>
+              <span>Full Capacity</span>
+            </div>
+            <Link href="/reservations" className="button button-outline button-small button-full">
+              Book Group Wheels →
             </Link>
           </div>
         </div>
